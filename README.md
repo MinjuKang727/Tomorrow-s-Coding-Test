@@ -12,7 +12,9 @@
 > 책을 따라 하긴 하는데, 내가 얼마나 실습을 했는지, 앞으로 몇개의 실습이 남았는지 알 수 없었죠?  
 > 학습 진도율을 한 눈에 살펴보며 공부에 집중해요!
 
-👉 [프로그래머스 실습 페이지로 이동](https://school.programmers.co.kr/learn/courses/17584/17584-%EB%82%B4%EC%9D%BC%EC%9D%80-%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-with-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0%EC%99%80-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98%EC%9D%98-%EA%B8%B0%EC%B4%88%EB%B6%80%ED%84%B0-%EC%8B%A4%EC%A0%84%EA%B9%8C%EC%A7%80)  
+👉 [프로그래머스 실습 페이지로 이동](https://school.programmers.co.kr/learn/courses/17584/17584-%EB%82%B4%EC%9D%BC%EC%9D%80-%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-with-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0%EC%99%80-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98%EC%9D%98-%EA%B8%B0%EC%B4%88%EB%B6%80%ED%84%B0-%EC%8B%A4%EC%A0%84%EA%B9%8C%EC%A7%80)  (x)  
+
+👉 [프로그래머스로 이동](https://programmers.co.kr/?locale=ko)
 
 <table>
   <tr>
