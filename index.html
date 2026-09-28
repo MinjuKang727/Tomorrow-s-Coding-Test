@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>코딩테스트 마크다운 통합 변환기</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --success-hover: #059669;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .row-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row-group .form-group {
+            flex: 1;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: vertical;
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.convert-btn {
+            background-color: var(--primary);
+        }
+        button.convert-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.download-btn {
+            background-color: var(--success);
+        }
+        button.download-btn:hover {
+            background-color: var(--success-hover);
+        }
+
+        .result-section {
+            margin-top: 35px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .result-section h3 {
+            font-size: 18px;
+            margin: 0;
+            color: #374151;
+        }
+
+        .edit-toggle-btn {
+            padding: 6px 12px;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: unset;
+        }
+        .edit-toggle-btn.editing {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            background-color: #e5e7eb;
+            color: #374151;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: unset;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        textarea.raw-editor {
+            width: 100%;
+            height: 450px;
+            background-color: #f8fafc;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            color: #334155;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .preview-box {
+            background-color: #ffffff;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+
+        .preview-box h1 { font-size: 22px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 0; }
+        .preview-box h2 { font-size: 18px; margin-top: 15px; border-bottom: none; color: #1f2937; }
+        
+        /* 소제목 위쪽(전 행) 여백은 여유 있게, 아래쪽 여백은 0으로 설정 */
+        .preview-box h3 { 
+            font-size: 16px; 
+            margin: 22px 0 0px 0 !important; 
+            color: #374151; 
+        }
+        .preview-box h4 { 
+            font-size: 15px; 
+            margin: 18px 0 0px 0 !important; 
+            color: #374151; 
+        }
+
+        /* ★ 실행 결과 카드의 소제목 바로 다음에 오는 표(table) 간격을 바짝 좁힘 */
+        .card-result h3 + table {
+            margin-top: -12px !important;
+        }
+        
+        .preview-box blockquote { 
+            border-left: 4px solid var(--primary); 
+            margin: 8px 0; 
+            color: #4b5563; 
+            background: #f9fafb; 
+            padding: 6px 10px; 
+            border-radius: 4px; 
+        }
+
+        .preview-box ul {
+            margin: 2px 0 6px 0;
+            padding-left: 24px;
+            list-style-type: disc;
+        }
+
+        .preview-box li {
+            margin-bottom: 2px;
+        }
+
+        .preview-box p {
+            margin: 2px 0 4px 0;
+        }
+
+        .preview-box table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+        .preview-box th, .preview-box td { border: 1px solid #d1d5db; padding: 6px 10px; font-size: 14px; text-align: left; }
+        .preview-box th { background-color: #f3f4f6; }
+        
+        .preview-box pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            margin: 4px 0;
+        }
+        .preview-box code {
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .card-box {
+            border-radius: 10px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .card-problem { background: #faf5ff; border: 1px solid #e9d5ff; }
+        .card-code { background: #f8fafc; border: 1px solid #e2e8f0; }
+        .card-result { background: #fdfdfd; border: 1px solid #e5e7eb; }
+
+        .hl-keyword { color: #c678dd; font-weight: bold; }
+        .hl-builtin { color: #61afef; }
+        .hl-string { color: #98c379; }
+        .hl-number { color: #d19a66; }
+
+        .preview-box hr { border: none; border-top: 1px dashed #d1d5db; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>✨ 코딩테스트 마크다운 통합 변환기</h2>
+
+        <div class="row-group">
+            <div class="form-group">
+                <label for="problemIdInput">문제 번호 (URL 및 파일명)</label>
+                <input type="text" id="problemIdInput" placeholder="예: 85892" value="85892">
+            </div>
+            <div class="form-group">
+                <label for="langSelect">사용 언어</label>
+                <select id="langSelect">
+                    <option value="c">C</option>
+                    <option value="cpp">C++</option>
+                    <option value="csharp">C#</option>
+                    <option value="go">Go</option>
+                    <option value="java">Java</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="kotlin">Kotlin</option>
+                    <option value="python" selected>Python3</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="scala">Scala</option>
+                    <option value="swift">Swift</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="unifiedInput">전체 텍스트 붙여넣기 (순서 상관없이 통째로)</label>
+            <textarea id="unifiedInput" placeholder="문제 본문, 코드, 실행 결과, 채점 결과를 순서 상관없이 이곳에 통째로 붙여넣으세요..."></textarea>
+        </div>
+        
+        <div class="btn-group">
+            <button class="convert-btn" onclick="convertText()">마크다운 변환 및 미리보기</button>
+            <button class="download-btn" onclick="downloadMarkdown()">📥 .md 파일 다운로드</button>
+        </div>
+
+        <div class="result-section">
+            <div class="result-header">
+                <h3>결과 확인 및 편집</h3>
+                <button id="editToggleBtn" class="edit-toggle-btn" onclick="toggleEditMode()">✏️ 수정하기</button>
+            </div>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('preview')">👀 미리보기</button>
+                <button class="tab-btn" onclick="switchTab('raw')">📝 마크다운 소스</button>
+            </div>
+            
+            <div id="previewTab" class="tab-content active">
+                <div id="previewBox" class="preview-box">변환 버튼을 누르면 미리보기가 여기에 표시됩니다.</div>
+            </div>
+            
+            <div id="rawTab" class="tab-content">
+                <textarea id="outputText" class="raw-editor" readonly placeholder="변환 버튼을 누르면 마크다운 소스가 여기에 표시됩니다."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEditing = false;
+
+        function toggleEditMode() {
+            isEditing = !isEditing;
+            const btn = document.getElementById('editToggleBtn');
+            const rawEditor = document.getElementById('outputText');
+
+            if (isEditing) {
+                btn.textContent = "💾 수정 완료 및 반영";
+                btn.classList.add('editing');
+                rawEditor.removeAttribute('readonly');
+            } else {
+                btn.textContent = "✏️ 수정하기";
+                btn.classList.remove('editing');
+                rawEditor.setAttribute('readonly', 'true');
+                document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(rawEditor.value));
+            }
+        }
+
+        function colorizeStatus(text) {
+            if (text.includes("통과") || text.includes("성공")) {
+                return `<span style="color: #2563eb; font-weight: 600;">${text}</span>`;
+            } else if (text.includes("실패") || text.includes("오류") || text.includes("시간 초과")) {
+                return `<span style="color: #dc2626; font-weight: 600;">${text}</span>`;
+            }
+            return text;
+        }
+
+        function isTestArtifact(line) {
+            if (!line) return false;
+            if (line === '실행 결과') return true;
+            if (/^(효율성|합계)\s*[:：]/.test(line)) return true;
+            if (/^테스트\s*\d+/.test(line)) return true;
+            if (/^입력값\s*[〉>]/.test(line)) return true;
+            if (/^기댓값\s*[〉>]/.test(line)) return true;
+            if (/^실행\s*결과\s*[〉>]/.test(line)) return true;
+            if (/\d+개\s*중\s*\d+개\s*성공/.test(line)) return true;
+            if (line.includes('샘플 테스트 케이스를 통과했다는')) return true;
+            if (line.includes('같은 코드로 채점한 결과가 있습니다')) return true;
+            if (line.includes('테스트를 통과하였습니다')) return true;
+            if (line.includes('테스트 결과 (~˘▾˘)~')) return true;
+            if (line.includes('버튼을 통해 확인하실 수 있습니다')) return true;
+            return false;
+        }
+
+        function generateMarkdownContent() {
+            const problemId = document.getElementById('problemIdInput').value.trim() || "85892";
+            const langSelectElem = document.getElementById('langSelect');
+            const selectedLangText = langSelectElem.options[langSelectElem.selectedIndex].text;
+            let langCode = langSelectElem.value;
+
+            const rawText = document.getElementById('unifiedInput').value;
+            const rawLines = rawText.split('\n');
+
+            let bookInfoLines = [];
+            let problemDescLines = [];
+            let restrictions = [];
+            let ioRows = [];
+            let ioExSections = [];
+            let rawCodeLines = [];
+
+            let sampleTests = []; 
+            let sampleSummary = "";
+            let gradeTests = []; 
+            let accuracyScore = "0.0";
+            let efficiencyScore = "0.0";
+            let totalScore = "0.0 / 100.0";
+
+            parseResults(rawText);
+
+            let state = 'FIND_BOOK_INFO';
+            let currentExTitle = "";
+            let currentExContent = [];
+
+            for (let i = 0; i < rawLines.length; i++) {
+                let rawLine = rawLines[i];
+                let line = rawLine.trim();
+
+                if (!line) continue;
+
+                if (state === 'FIND_BOOK_INFO') {
+                    if (isTestArtifact(line)) continue;
+                    if (line === '문제 설명') {
+                        state = 'PROBLEM_DESC';
+                        continue;
+                    }
+                    if (line !== '도움말' && line !== '컴파일 옵션') {
+                        bookInfoLines.push(line);
+                    }
+                    continue;
+                }
+
+                if (isTestArtifact(line)) {
+                    if (state === 'CODE') {
+                        break;
+                    }
+                    continue;
+                }
+
+                if (line === '문제 설명') {
+                    state = 'PROBLEM_DESC';
+                    continue;
+                } else if (line === '제한사항') {
+                    state = 'RESTRICTIONS';
+                    continue;
+                } else if (line === '입출력 예') {
+                    state = 'IO_TABLE';
+                    continue;
+                } else if (line === '입출력 예 설명') {
+                    state = 'IO_EX';
+                    continue;
+                } else if (line.startsWith('solution.') || line.includes('def solution') || line.includes('#include') || line.includes('public class')) {
+                    state = 'CODE';
+                    if (!line.startsWith('solution.')) {
+                        rawCodeLines.push(rawLine);
+                    }
+                    continue;
+                }
+
+                if (state === 'PROBLEM_DESC') {
+                    problemDescLines.push(line);
+                } else if (state === 'RESTRICTIONS') {
+                    restrictions.push(line);
+                } else if (state === 'IO_TABLE') {
+                    let parts = line.split(/\s+/);
+                    if (parts.length >= 2) {
+                        ioRows.push(parts);
+                    }
+                } else if (state === 'IO_EX') {
+                    if (line.startsWith('입출력 예 #')) {
+                        if (currentExTitle) {
+                            ioExSections.push({ title: currentExTitle, content: [...currentExContent] });
+                            currentExContent = [];
+                        }
+                        currentExTitle = line;
+                    } else {
+                        if (line !== '도움말' && line !== '컴파일 옵션') {
+                            currentExContent.push(line);
+                        }
+                    }
+                } else if (state === 'CODE') {
+                    if (/^\d+$/.test(line)) {
+                        continue;
+                    }
+                    if (isTestArtifact(line)) {
+                        break;
+                    }
+                    rawCodeLines.push(rawLine);
+                }
+            }
+            if (currentExTitle) {
+                ioExSections.push({ title: currentExTitle, content: [...currentExContent] });
+            }
+
+            if (rawCodeLines.length === 0) {
+                let codeStartIdx = -1;
+                for (let k = 0; k < rawLines.length; k++) {
+                    if (rawLines[k].includes('def solution') || rawLines[k].includes('solution.py') || rawLines[k].includes('#include')) {
+                        codeStartIdx = k;
+                        break;
+                    }
+                }
+                if (codeStartIdx !== -1) {
+                    for (let k = codeStartIdx; k < rawLines.length; k++) {
+                        let rl = rawLines[k];
+                        let trimmed = rl.trim();
+                        if (isTestArtifact(trimmed)) break;
+                        if (/^\d+$/.test(trimmed)) continue;
+                        if (trimmed.startsWith('solution.')) continue;
+                        rawCodeLines.push(rl);
+                    }
+                }
+            }
+
+            let cleanCodeLines = [];
+            let inFunction = false;
+
+            for (let rl of rawCodeLines) {
+                let trimmed = rl.trim();
+                if (!trimmed) continue;
+                if (trimmed.startsWith('solution.')) continue;
+
+                if (trimmed.startsWith('def ') || trimmed.startsWith('public ') || trimmed.startsWith('int main') || trimmed.includes('solution(')) {
+                    inFunction = true;
+                }
+
+                let formattedLine = rl;
+                if (inFunction && !rl.startsWith('    ') && !rl.startsWith('\t') && !trimmed.startsWith('def ') && !trimmed.startsWith('import ') && !trimmed.startsWith('from ')) {
+                    formattedLine = '    ' + trimmed;
+                } else {
+                    formattedLine = rl.replace(/^\s+/, (match) => {
+                        let spaces = match.replace(/\t/g, '    ').length;
+                        return ' '.repeat(spaces);
+                    });
+                }
+                cleanCodeLines.push(formattedLine);
+            }
+
+            let returnIndex = -1;
+            for (let idx = 0; idx < cleanCodeLines.length; idx++) {
+                if (cleanCodeLines[idx].trim().startsWith('return ')) {
+                    returnIndex = idx;
+                    break;
+                }
+            }
+            if (returnIndex !== -1 && returnIndex < cleanCodeLines.length - 1) {
+                cleanCodeLines = cleanCodeLines.slice(0, returnIndex + 1);
+            }
+
+            function parseResults(resText) {
+                let compactMatches = [...resText.matchAll(/테스트\s*(\d+)입력값\s*[〉>]\s*(['"].*?['"]|\S+)기댓값\s*[〉>]\s*(\S+)실행\s*결과\s*[〉>]\s*([^\n]+)/g)];
+                for (let m of compactMatches) {
+                    sampleTests.push({
+                        num: m[1],
+                        input: m[2].trim(),
+                        expect: m[3].trim(),
+                        result: m[4].trim()
+                    });
+                }
+
+                if (sampleTests.length === 0) {
+                    let testMatches = [...resText.matchAll(/테스트\s*(\d+)[\s\S]*?입력값\s*[〉>]\s*([^\n]+)[\s\S]*?기댓값\s*[〉>]\s*([^\n]+)[\s\S]*?실행\s*결과\s*[〉>]\s*([^\n]+)/g)];
+                    for (let m of testMatches) {
+                        sampleTests.push({
+                            num: m[1],
+                            input: m[2].trim(),
+                            expect: m[3].trim(),
+                            result: m[4].trim()
+                        });
+                    }
+                }
+
+                if (resText.includes('성공')) {
+                    let matchSucc = resText.match(/(\d+개\s*중\s*\d+개\s*성공)/);
+                    if (matchSucc) sampleSummary = matchSucc[1];
+                }
+
+                let gradeMatches = [...resText.matchAll(/테스트\s*(\d+)\s*[〉>]\s*([^\s]+)\s*\(([^)]+)\)/g)];
+                for (let m of gradeMatches) {
+                    gradeTests.push({
+                        num: m[1],
+                        status: m[2],
+                        detail: m[3]
+                    });
+                }
+
+                let accMatch = resText.match(/정확성\s*[:]\s*([\d.]+)/);
+                if (accMatch) accuracyScore = accMatch[1];
+
+                let effMatch = resText.match(/효율성\s*[:]\s*([\d.]+)/);
+                if (effMatch) efficiencyScore = effMatch[1];
+
+                let totMatch = resText.match(/합계\s*[:]\s*([^\n]+)/);
+                if (totMatch) totalScore = totMatch[1].trim();
+            }
+
+            let validBookLines = bookInfoLines.filter(l => !isTestArtifact(l) && l !== '도움말' && l !== '컴파일 옵션');
+            
+            let problemTitle = "";
+            let breadcrumbLines = [];
+
+            if (validBookLines.length > 0) {
+                problemTitle = validBookLines[validBookLines.length - 1];
+                breadcrumbLines = validBookLines.slice(0, validBookLines.length - 1);
+            }
+            if (!problemTitle) problemTitle = "코딩테스트 문제";
+
+            let fullBreadcrumb = breadcrumbLines.join(" > ");
+
+            let result = `# ${problemTitle}\n\n`;
+            if (fullBreadcrumb) {
+                result += `> > ${fullBreadcrumb}\n\n`;
+            }
+            result += `👉 [문제 바로가기](https://school.programmers.co.kr/tryouts/${problemId}/challenges)\n\n`;
+            
+            result += `<!-- CARD_PROBLEM_START -->\n`;
+            result += `### 문제 설명\n`;
+            problemDescLines.forEach(l => result += `${l}\n`);
+            result += `\n`;
+
+            result += `### 제한사항\n`;
+            restrictions.forEach(l => result += `* ${l}\n`);
+            result += `\n`;
+
+            result += `### 입출력 예\n`;
+            if (ioRows.length > 0) {
+                result += `| ${ioRows[0][0]} | ${ioRows[0][1]} |\n`;
+                result += `|---|---|\n`;
+                for (let r = 1; r < ioRows.length; r++) {
+                    result += `| ${ioRows[r][0]} | ${ioRows[r][1]} |\n`;
+                }
+            }
+            result += `\n`;
+
+            result += `### 입출력 예 설명\n`;
+            ioExSections.forEach(ex => {
+                let titleNum = ex.title.replace('입출력 예 #', '입출력 예 ');
+                result += `#### ${titleNum}\n`;
+                ex.content.forEach(c => result += `* ${c}\n`);
+                result += `\n`;
+            });
+            result += `<!-- CARD_PROBLEM_END -->\n\n`;
+
+            if (cleanCodeLines.length > 0) {
+                let ext = "py";
+                if (selectedLangText.toLowerCase().includes("c++") || langCode === "cpp") ext = "cpp";
+                else if (selectedLangText.toLowerCase() === "c") ext = "c";
+                else if (selectedLangText.toLowerCase().includes("java") && !selectedLangText.toLowerCase().includes("script")) ext = "java";
+                else if (selectedLangText.toLowerCase().includes("javascript")) ext = "js";
+                else if (selectedLangText.toLowerCase().includes("kotlin")) ext = "kt";
+                else if (selectedLangText.toLowerCase().includes("swift")) ext = "swift";
+                
+                let highlightLang = langCode;
+                if (highlightLang === "python3" || highlightLang === "python") highlightLang = "python";
+                
+                result += `<!-- CARD_CODE_START -->\n`;
+                result += `solution.${ext}\n\n`;
+                result += `\`\`\`${highlightLang}\n`;
+                result += cleanCodeLines.join('\n') + `\n`;
+                result += `\`\`\`\n`;
+                result += `<!-- CARD_CODE_END -->\n\n`;
+            }
+
+            if (sampleTests.length > 0) {
+                result += `<!-- CARD_RESULT_START -->\n`;
+                result += `### 실행 결과\n`;
+                sampleTests.forEach(tb => {
+                    let coloredRes = colorizeStatus(tb.result);
+                    result += `| 테스트 ${tb.num} | |\n`;
+                    result += `|---|---|\n`;
+                    result += `| 입력값 | ${tb.input} |\n`;
+                    result += `| 기댓값 | ${tb.expect} |\n`;
+                    result += `| 실행 결과 | ${coloredRes} |\n\n`;
+                });
+                result += `테스트 결과 (~˘▾˘)~\n\n`;
+                let succText = sampleSummary || "2개 중 2개 성공";
+                result += `${colorizeStatus(succText)}\n\n`;
+                result += `샘플 테스트 케이스를 통과했다는 의미로, 작성한 코드가 문제의 정답은 아닐 수 있습니다.\n\n`;
+                result += `(샘플 테스트 케이스는 [테스트 케이스 추가하기] 버튼을 통해 확인하실 수 있습니다.)\n`;
+                result += `<!-- CARD_RESULT_END -->\n\n`;
+            }
+
+            if (gradeTests.length > 0) {
+                result += `<!-- CARD_GRADE_START -->\n`;
+                result += `### 채점 결과\n`;
+                result += `| 정확성 테스트 | |\n`;
+                result += `|---|---|\n`;
+                gradeTests.forEach(gt => {
+                    let fullText = `${gt.status} (${gt.detail})`;
+                    let coloredFullText = colorizeStatus(fullText);
+                    result += `| 테스트 ${gt.num} | ${coloredFullText} |\n`;
+                });
+                result += `\n`;
+                result += `채점 결과\n\n`;
+                result += `* 정확성: ${accuracyScore}\n`;
+                result += `* 효율성: ${efficiencyScore}\n`;
+                result += `* 합계: ${totalScore}\n`;
+                result += `<!-- CARD_GRADE_END -->`;
+            }
+
+            return result.trim();
+        }
+
+        function highlightCode(codeText) {
+            let escaped = codeText
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            return escaped
+                .replace(/\b(import|def|for|in|return|if|else|while|class|from)\b/g, '<span class="hl-keyword">$1</span>')
+                .replace(/\b(int|str|len|range|print|findall)\b/g, '<span class="hl-builtin">$1</span>')
+                .replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '<span class="hl-string">$&</span>');
+        }
+
+        function parseMarkdownToHtml(md) {
+            let codeBlocks = [];
+            let processed = md.replace(/```([a-z]*)\n([\s\S]*?)```/g, function(match, lang, code) {
+                let highlighted = highlightCode(code.trim());
+                let token = `___CODE_BLOCK_${codeBlocks.length}___`;
+                codeBlocks.push(`<pre><code>${highlighted}</code></pre>`);
+                return token;
+            });
+
+            let html = processed
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            codeBlocks.forEach((block, idx) => {
+                html = html.replace(`___CODE_BLOCK_${idx}___`, block);
+            });
+
+            html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+            html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+            html = html.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
+
+            html = html.replace(/^&gt; &gt; (.*$)/gm, '<blockquote><blockquote>$1</blockquote></blockquote>');
+            html = html.replace(/^&gt; (.*$)/gm, '<blockquote>$1</blockquote>');
+
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+            html = html.replace(/^\* (.*$)/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>(\s*<li>.*<\/li>)*)/g, '<ul>$1</ul>');
+
+            html = html.replace(/\|(.+)\|/g, function(match, p1) {
+                let cols = p1.split('|').map(c => `<td>${c.trim()}</td>`).join('');
+                return `<tr>${cols}</tr>`;
+            });
+            html = html.replace(/(<tr>.*<\/tr>\s*)+/g, '<table>$&</table>');
+            html = html.replace(/<td>---<\/td>/g, '');
+
+            html = html.replace(/&lt;span style=&quot;([^&]+)&quot;&gt;/g, '<span style="$1">');
+            html = html.replace(/&lt;\/span&gt;/g, '</span>');
+            html = html.replace(/&lt;span style="([^"]+)"&gt;/g, '<span style="$1">');
+
+            html = html.replace(/\n\n/g, '<br>');
+
+            return html;
+        }
+
+        function renderCardPreview(htmlContent) {
+            let html = htmlContent;
+
+            html = html.replace(/&lt;!-- CARD_PROBLEM_START --&gt;([\s\S]*?)&lt;!-- CARD_PROBLEM_END --&gt;/g, '<div class="card-box card-problem">$1</div>');
+            html = html.replace(/&lt;!-- CARD_CODE_START --&gt;([\s\S]*?)&lt;!-- CARD_CODE_END --&gt;/g, '<div class="card-box card-code">$1</div>');
+            html = html.replace(/&lt;!-- CARD_RESULT_START --&gt;([\s\S]*?)&lt;!-- CARD_RESULT_END --&gt;/g, '<div class="card-box card-result">$1</div>');
+            html = html.replace(/&lt;!-- CARD_GRADE_START --&gt;([\s\S]*?)&lt;!-- CARD_GRADE_END --&gt;/g, '<div class="card-box card-result">$1</div>');
+
+            return html;
+        }
+
+        function convertText() {
+            if (isEditing) {
+                toggleEditMode();
+            }
+            const mdContent = generateMarkdownContent();
+            document.getElementById('outputText').value = mdContent;
+            document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(mdContent));
+        }
+
+        function switchTab(tabName) {
+            const previewTab = document.getElementById('previewTab');
+            const rawTab = document.getElementById('rawTab');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            if (tabName === 'preview') {
+                previewTab.classList.add('active');
+                rawTab.classList.remove('active');
+                buttons[0].classList.add('active');
+                const currentRaw = document.getElementById('outputText').value;
+                document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(currentRaw));
+            } else {
+                rawTab.classList.add('active');
+                previewTab.classList.remove('active');
+                buttons[1].classList.add('active');
+            }
+        }
+
+        function downloadMarkdown() {
+            const content = document.getElementById('outputText').value || generateMarkdownContent();
+            const problemId = document.getElementById('problemIdInput').value.trim() || "85892";
+            const filename = `${problemId}.md`;
+
+            const blob = new Blob([content], { type: 'text/markdown;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+</body>
+</html>
