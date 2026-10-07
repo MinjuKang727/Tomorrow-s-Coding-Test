@@ -371,7 +371,8 @@
                 btn.textContent = "✏️ 수정하기";
                 btn.classList.remove('editing');
                 rawEditor.setAttribute('readonly', 'true');
-                document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(rawEditor.value));
+                // document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(rawEditor.value));
+                document.getElementById('previewBox').innerHTML = parseMarkdownToHtml(rawEditor.value);
             }
         }
 
@@ -631,33 +632,46 @@
             }
             result += `👉 [문제 바로가기](https://school.programmers.co.kr/tryouts/${problemId}/challenges)\n\n`;
             
-            result += `<!-- CARD_PROBLEM_START -->\n`;
-            result += `### 문제 설명\n`;
+            result += `---\n\n`;
+            result += `### 문제 설명\n\n`;
             problemDescLines.forEach(l => result += `${l}\n`);
             result += `\n`;
 
-            result += `### 제한사항\n`;
+            result += `### 제한사항\n\n`;
             restrictions.forEach(l => result += `* ${l}\n`);
             result += `\n`;
 
-            result += `### 입출력 예\n`;
+            result += `### 입출력 예\n\n`;
             if (ioRows.length > 0) {
-                result += `| ${ioRows[0][0]} | ${ioRows[0][1]} |\n`;
-                result += `|---|---|\n`;
+                result += "|"
+                let cols = ioRows[0].length;
+                for (let c = 0; c < cols; c++) {
+                    result += ` ${ioRows[0][c]} |`
+                }
+                result += `\n`;
+                result += "|";
+                for (let c = 0; c < cols; c++) {
+                    result += `---|`;
+                }
+                result += `\n`;
                 for (let r = 1; r < ioRows.length; r++) {
-                    result += `| ${ioRows[r][0]} | ${ioRows[r][1]} |\n`;
+                    result += "|";
+                    for (let c = 0; c < cols; c++) {
+                        result += ` ${ioRows[r][c]} |`
+                    }
+                    result += `\n`;
                 }
             }
             result += `\n`;
 
-            result += `### 입출력 예 설명\n`;
+            result += `### 입출력 예 설명\n\n`;
             ioExSections.forEach(ex => {
                 let titleNum = ex.title.replace('입출력 예 #', '입출력 예 ');
-                result += `#### ${titleNum}\n`;
+                result += `#### ${titleNum}\n\n`;
                 ex.content.forEach(c => result += `* ${c}\n`);
-                result += `\n`;
+                result += `\n\n`;
             });
-            result += `<!-- CARD_PROBLEM_END -->\n\n`;
+            result += `---\n\n`;
 
             if (cleanCodeLines.length > 0) {
                 let ext = "py";
@@ -671,17 +685,15 @@
                 let highlightLang = langCode;
                 if (highlightLang === "python3" || highlightLang === "python") highlightLang = "python";
                 
-                result += `<!-- CARD_CODE_START -->\n`;
-                result += `solution.${ext}\n\n`;
+                result += `### solution.${ext}\n\n`;
                 result += `\`\`\`${highlightLang}\n`;
                 result += cleanCodeLines.join('\n') + `\n`;
-                result += `\`\`\`\n`;
-                result += `<!-- CARD_CODE_END -->\n\n`;
+                result += `\`\`\`\n\n`;
+                result += `---\n\n`;
             }
 
             if (sampleTests.length > 0) {
-                result += `<!-- CARD_RESULT_START -->\n`;
-                result += `### 실행 결과\n`;
+                result += `### 실행 결과\n\n`;
                 sampleTests.forEach(tb => {
                     let coloredRes = colorizeStatus(tb.result);
                     result += `| 테스트 ${tb.num} | |\n`;
@@ -693,14 +705,13 @@
                 result += `테스트 결과 (~˘▾˘)~\n\n`;
                 let succText = sampleSummary || "2개 중 2개 성공";
                 result += `${colorizeStatus(succText)}\n\n`;
-                result += `샘플 테스트 케이스를 통과했다는 의미로, 작성한 코드가 문제의 정답은 아닐 수 있습니다.\n\n`;
-                result += `(샘플 테스트 케이스는 [테스트 케이스 추가하기] 버튼을 통해 확인하실 수 있습니다.)\n`;
-                result += `<!-- CARD_RESULT_END -->\n\n`;
+                result += `샘플 테스트 케이스를 통과했다는 의미로, 작성한 코드가 문제의 정답은 아닐 수 있습니다.\n`;
+                result += `(샘플 테스트 케이스는 [테스트 케이스 추가하기] 버튼을 통해 확인하실 수 있습니다.)\n\n`;
+                result += `---\n\n`;
             }
 
             if (gradeTests.length > 0) {
-                result += `<!-- CARD_GRADE_START -->\n`;
-                result += `### 채점 결과\n`;
+                result += `### 채점 결과\n\n`;
                 result += `| 정확성 테스트 | |\n`;
                 result += `|---|---|\n`;
                 gradeTests.forEach(gt => {
@@ -709,11 +720,9 @@
                     result += `| 테스트 ${gt.num} | ${coloredFullText} |\n`;
                 });
                 result += `\n`;
-                result += `채점 결과\n\n`;
                 result += `* 정확성: ${accuracyScore}\n`;
                 result += `* 효율성: ${efficiencyScore}\n`;
                 result += `* 합계: ${totalScore}\n`;
-                result += `<!-- CARD_GRADE_END -->`;
             }
 
             return result.trim();
@@ -794,7 +803,8 @@
             }
             const mdContent = generateMarkdownContent();
             document.getElementById('outputText').value = mdContent;
-            document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(mdContent));
+            // document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(mdContent));
+            document.getElementById('previewBox').innerHTML = parseMarkdownToHtml(mdContent);
         }
 
         function switchTab(tabName) {
@@ -809,7 +819,8 @@
                 rawTab.classList.remove('active');
                 buttons[0].classList.add('active');
                 const currentRaw = document.getElementById('outputText').value;
-                document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(currentRaw));
+                // document.getElementById('previewBox').innerHTML = renderCardPreview(parseMarkdownToHtml(currentRaw));
+                document.getElementById('previewBox').innerHTML = parseMarkdownToHtml(currentRaw);
             } else {
                 rawTab.classList.add('active');
                 previewTab.classList.remove('active');
